@@ -4,7 +4,7 @@
  * Created Date: 01.02.2023 21:01:00
  * Author: 3urobeat
  * 
- * Last Modified: 02.02.2023 11:50:21
+ * Last Modified: 02.02.2023 11:59:34
  * Modified By: 3urobeat
  * 
  * Copyright (c) 2023 3urobeat <https://github.com/HerrEurobeat>
@@ -23,8 +23,8 @@
 
 
 // Config vars
-const float startAfterMin = 1;   // Min time in minutes to start after poweron
-const float startAfterMax = 2.5; // Max time in minutes to start after poweron
+const int startAfterMin = 30;   // Min time in seconds to start after poweron
+const int startAfterMax = 90; // Max time in seconds to start after poweron
 
 const int totalTime = 2; // Total time in minutes
 
@@ -64,7 +64,9 @@ void setup()
     }
 
     // Wait random amount of time between min and max before starting
-    delay((rand() + startAfterMin) / startAfterMax);
+    unsigned long waitTime = (rand() / (startAfterMax * 1000)) + (startAfterMin * 1000);
+
+    while (waitTime > millis()) { delay(250); }
 }
 
 
@@ -89,10 +91,15 @@ void loop()
     // Iterate over all pins and turn them on after another
     for (uint8_t i = 0; i < pinSize; i++) {
         digitalWrite(pins[i], HIGH);
-        delay((unsigned long) (((baseTime + (counter * stepSize)) * 1000) / pinSize)); // Add stepSize counter times to baseTime, convert to ms and divide by amount of pins so that each pin
+
+        unsigned long waitTime2 = millis() + (((baseTime + (counter * stepSize)) * 1000) / pinSize); // Add stepSize counter times to baseTime, convert to ms and divide by amount of pins so that each pin
+        while (waitTime2 > millis()) { delay(250); }
+
         digitalWrite(pins[i], LOW);
     }
 
     // Wait before next iteration
-    delay(pauseTime * 1000);
+    unsigned long waitTime3 = millis() + (pauseTime * 1000);
+
+    while (waitTime3 > millis()) { delay(250); }
 }
